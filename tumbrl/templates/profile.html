@@ -1,0 +1,83 @@
+{% extends "perry.html" %}
+
+{% block titulo %} Perfil do {{ user.username }} {% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="text-center">Bem-vindo, {{ user.username }}!</h1>
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <a href="{{ url_for('homepage') }}" class="btn btn-primary btn-block">Homepage</a>
+            <a href="{{ url_for('timeline') }}" class="btn btn-primary btn-block">Timeline</a>
+        </div>
+    </div>
+
+    <h2 class="text-center">Meu Perfil</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.csrf_token }}
+
+        <div class="form-group">
+            {{ form.text.label(class="form-label") }}
+            {{ form.text(class="form-control") }}
+        </div>
+
+        <div class="form-group">
+            {{ form.photo.label(class="form-label") }}
+            {{ form.photo(class="form-control") }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Publicar</button>
+    </form>
+
+    {% for post in user.posts %}
+        <div class="card mt-3">
+            <div class="card-body">
+                <p>{{ post.post_text }}</p>
+
+                <img class="img-thumbnail rounded" src="{{ url_for('static', filename='fotos_dos_posts/' ~ post.post_img) }}">
+
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#postModal{{ post.id }}">
+                    Ampliar Imagem
+                </button>
+
+                <h4>Comentários:</h4>
+                <ul class="list-group">
+                    {% for comment in post.comments %}
+                        <li class="list-group-item">{{ comment.text }}</li>
+                    {% endfor %}
+                </ul>
+
+                <form method="POST" action="{{ url_for('add_comment', post_id=post.id) }}">
+                    {{ form_add_comment_profile.hidden_tag() }}
+                    <div class="form-group">
+                        {{ form_add_comment_profile.comment_text.label(class="form-label") }}
+                        {{ form_add_comment_profile.comment_text(class="form-control", size=20) }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Comentar</button>
+                </form>
+
+                <h4>Curtidas:</h4>
+                <p>{{ post.likes.count() }} Curtidas</p>
+
+                <form method="POST" action="{{ url_for('add_like', post_id=post.id) }}">
+                    {{ form_add_like_profile.hidden_tag() }}
+                    <button type="submit" class="btn btn-primary">Curtir</button>
+                </form>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% for post in user.posts %}
+    <div class="modal fade" id="postModal{{ post.id }}" tabindex="-1" role="dialog" aria-labelledby="postModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img src="{{ url_for('static', filename='fotos_dos_posts/' ~ post.post_img) }}" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+{% endblock %}
