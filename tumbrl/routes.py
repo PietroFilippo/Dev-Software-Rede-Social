@@ -87,50 +87,61 @@ def profile(user_id):
             database.session.commit()
 
         return render_template('profile.html', user=current_user, form=_formCreateNewPost,
-                               form_add_comment_profile=form_add_comment_profile, form_add_like_profile=form_add_like_profile)
-
-    else:
-        _user = User.query.get(int(user_id))
-        pass
-
-        return render_template('profile.html', user=_user, form=None,
-                               form_add_comment_profile=form_add_comment_profile, form_add_like_profile=form_add_like_profile)
+                               # renderiza o perfil do adicionando os comentários e curtidas nos posts
+                               form_add_comment_profile=form_add_comment_profile,
+                               form_add_like_profile=form_add_like_profile)
 
 
-
+# route para exibir a timeline com os posts
 @app.route('/timeline')
 def timeline():
+    # pega todos os posts do banco de dados
     timeline = Posts.query.all()
+    # atribui aos formulários a opção para adicionar comentários e likes nos posts na timeline
     form_add_comment = FormAddComment()
     form_add_like = FormAddLike()
-    return render_template('timeline.html', all_posts=timeline, form_add_comment=form_add_comment, form_add_like=form_add_like)
+
+    # renderiza a página da tieline com todos os posts
+    return render_template('timeline.html', all_posts=timeline, form_add_comment=form_add_comment,
+                           form_add_like=form_add_like)
 
 
+# route para fazer um comentário a um post
 @app.route('/add_comment/<post_id>', methods=['POST'])
 @login_required
 def add_comment(post_id):
+    # pega o post com o id
     post = Posts.query.get(post_id)
-    if post:
-            comment_text = request.form.get('comment_text')
-            new_comment = Comment(text=comment_text, user_id=current_user.id, post_id=post.id)
-            database.session.add(new_comment)
-            database.session.commit()
 
+    if post:
+        # pega o texto do comentário do formulário
+        comment_text = request.form.get('comment_text')
+        # cria um novo objeto de comentário no banco de dados
+        new_comment = Comment(text=comment_text, user_id=current_user.id, post_id=post.id)
+        database.session.add(new_comment)
+        database.session.commit()
+
+    # redireciona de volta  ao perfil ou pra timeline
     return redirect(request.referrer or url_for('timeline'))
 
 
+# route para adicionar um like a um post
 @app.route('/add_like/<post_id>', methods=['POST'])
 @login_required
 def add_like(post_id):
+    # pega o post com o id
     post = Posts.query.get(post_id)
 
     if post:
+        # verifica se o usuário já deu like no post
         existing_like = Like.query.filter_by(user_id=current_user.id, post_id=post.id).first()
         if not existing_like:
+            # caso não cria um novo objeto de like no banco de dados
             new_like = Like(user_id=current_user.id, post_id=post.id)
             database.session.add(new_like)
             database.session.commit()
 
+    # redireciona de volta ao perfil ou pra timeline
     return redirect(request.referrer or url_for('timeline'))
 
 

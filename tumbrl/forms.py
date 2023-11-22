@@ -35,20 +35,24 @@ class FormCreateNewPost(FlaskForm):
     btn = SubmitField('Publish')
 
 
+# formulário fazer um comentário em um post na timeline
 class FormAddComment(FlaskForm):
     comment_text = StringField('Comment', validators=[DataRequired()])
     submit_comment = SubmitField('Comment')
 
 
+# formulário para fazer um comentário em um post no perfil do usuario
 class FormAddCommentProfile(FlaskForm):
     comment_text = StringField('Comment', validators=[DataRequired()])
     submit_comment = SubmitField('Comment')
 
 
+# formulário para fazer um like em um post na timeline
 class FormAddLike(FlaskForm):
     submit_like = SubmitField('Like')
 
 
+# formulário para fazer um like em um post no perfil do usuário
 class FormAddLikeProfile(FlaskForm):
     submit_like = SubmitField('Like')
 

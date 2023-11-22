@@ -4,7 +4,7 @@
 
 {% block body %}
 <div class="container mt-5">
-    <h1 class="text-center">Bem-vindo, {{ user.username }}!</h1>
+    <h1 class="text-center">Bem-vindo {{ user.username }}!</h1>
     <div class="row">
         <div class="col-md-6 offset-md-3">
             <a href="{{ url_for('homepage') }}" class="btn btn-primary btn-block">Homepage</a>
